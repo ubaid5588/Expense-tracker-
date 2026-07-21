@@ -16,6 +16,11 @@
 			path = "Expense Tracker";
 			sourceTree = "<group>";
 		};
+		527B2844300F7B3A00A73136 /* fonts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = fonts;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +37,7 @@
 		52060F3D300A53F8006D48E4 = {
 			isa = PBXGroup;
 			children = (
+				527B2844300F7B3A00A73136 /* fonts */,
 				52060F48300A53F8006D48E4 /* Expense Tracker */,
 				52060F47300A53F8006D48E4 /* Products */,
 			);
@@ -62,6 +68,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				52060F48300A53F8006D48E4 /* Expense Tracker */,
+				527B2844300F7B3A00A73136 /* fonts */,
 			);
 			name = "Expense Tracker";
 			packageProductDependencies = (
@@ -253,6 +260,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Expense-Tracker-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -284,6 +292,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Expense-Tracker-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
