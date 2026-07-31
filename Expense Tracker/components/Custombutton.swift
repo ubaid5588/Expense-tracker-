@@ -25,8 +25,3 @@ struct Custombutton : View {
         }
     }
 }
-#Preview{
-    OnboardingView()
-}
-
-

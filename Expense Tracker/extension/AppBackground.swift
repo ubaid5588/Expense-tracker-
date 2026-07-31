@@ -8,18 +8,18 @@ import SwiftUI
 
 extension View {
     func appBackground() -> some View {
-            self.background(
-                ZStack {
-                    Color(.orange) // base dark background
-
-                    RadialGradient(
-                        colors: [Color(.orange).opacity(0.55), .clear],
-                        center: .topTrailing,
-                        startRadius: 10,
-                        endRadius: 420
-                    )
-                }
+        self.background(
+            ZStack {
+                Circle()
+                    .fill(Color.orange.opacity(0.5))
+                    .frame(width: 500, height: 500)
+                    .blur(radius: 120)
+                    .offset(x: 130, y: -350)
+            }
                 .ignoresSafeArea()
-            )
-        }
+        ).padding(.horizontal,8)
+    }
+}
+#Preview{
+    RootView()
 }

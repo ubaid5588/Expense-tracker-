@@ -7,18 +7,41 @@
 
 import SwiftUI
 
-struct TabViewBar : View {
-    var body : some View {
-        TabView {
-            Tab("Home",systemImage: "house"){
-                HomeView()
-            }
-            Tab("Send",systemImage: "arrow.left.arrow.right"){
-            }
-            Tab("History",systemImage: "clock"){
-            }
-            Tab("Profile",systemImage: "person"){
-            }
-        }.tint(.orange)
+struct TabViewBar: View {
+
+    @State private var selectedTab = 0
+
+    var body: some View {
+
+        TabView(selection: $selectedTab) {
+
+            HomeView(selectedTab: $selectedTab)
+                .tabItem {
+                    Label("Home", systemImage: "house")
+                }
+                .tag(0)
+ 
+                TransactionView()
+                .tabItem {
+                    Label("Transaction", systemImage: "arrow.left.arrow.right")
+                }
+                .tag(1)
+
+            HistoryView()
+                .tabItem {
+                    Label("History", systemImage: "clock")
+                }
+                .tag(2)
+
+            SettingView()
+                .tabItem {
+                    Label("Profile", systemImage: "person")
+                }
+                .tag(3)
+        }
+        .tint(.orange)
     }
+}
+#Preview{
+    RootView()
 }

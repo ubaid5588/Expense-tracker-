@@ -6,24 +6,20 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct ExpenseTrackerApp: App {
 
-    @StateObject private var router = Router()
-
     var body: some Scene {
         WindowGroup {
-            NavigationStack(path: $router.path) {
-                SplashView().navigationDestination(for: Screen.self) { screen in
-                    switch screen {
-                    case .onboarding:
-                        OnboardingView()
-                    }
+                SplashView()
+                    }.modelContainer(for: [
+                        AppUser.self,
+                        Account.self,
+                        Transaction.self,
+                        Card.self
+                    ])
                 }
-            }
-            .environmentObject(router)
-        }
-    }
-}
 
+        }

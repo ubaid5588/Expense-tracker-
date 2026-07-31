@@ -13,8 +13,11 @@ struct Iconbutton : View {
     var body : some View {
         VStack{
             Button(action : action){
-                Image(systemName: icon).fontWeight(.semibold).foregroundStyle(.white).frame(width: 50,height: 50).background(Color.white.opacity(0.25)).clipShape(Circle())
+                Image(systemName: icon).fontWeight(.semibold).foregroundStyle(.white).frame(width: 50,height: 50).background(Color.black.opacity(0.25)).clipShape(Circle())
             }
         }
     }
+}
+#Preview {
+    RootView()
 }

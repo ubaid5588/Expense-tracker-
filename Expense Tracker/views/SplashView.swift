@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct SplashView: View {
-    @EnvironmentObject var router: Router
+    @State private var goToOnboarding = false
+    @State private var goToRootView = false
+    @AppStorage("isOnboardinCompleted") var isOnboardinCompleted = false
     var body: some View {
     
+        NavigationStack{
             VStack {
                 
                 LinearGradient(
@@ -36,12 +39,22 @@ struct SplashView: View {
                     .font(.system(.headline, design: .rounded, weight: .medium))
                     .foregroundStyle(.orange.opacity(0.7))
             }
-            .padding()
+            .padding().navigationDestination(isPresented: $goToOnboarding) {
+                OnboardingView()
+            }.navigationDestination(isPresented: $goToRootView) {
+                RootView()
+            }
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                    router.pushAndRemoveAll(.onboarding)
+                    if !isOnboardinCompleted {
+                        goToOnboarding = true
+                    }else{
+                        goToRootView = true
+                    }
+                    
                 }
             }
+        }
 
     }
 }

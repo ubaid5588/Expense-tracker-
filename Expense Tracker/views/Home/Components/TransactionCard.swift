@@ -1,21 +1,45 @@
-//
-//  TransactionCard.swift
-//  Expense Tracker
-//
-//  Created by Muhammad Ubaid on 23/07/2026.
-//
 import SwiftUI
 
+struct TransactionCard: View {
+    var title: String       // e.g. "Sent to Super Market", "Received from John Smith"
+    var amount: Double
+    var note: String
+    var date: Date
+    var isAdd: Bool
 
-struct TransactionCard : View {
-    let image : String
-    let title : String
-    let subtitle : String
-    let amount : Double
-    let isAdd : Bool
-    var body : some View {
-        HStack{
-            Image(systemName: "person.fill")
+    /// Everything after the first two words — the actual name (person, market, card, etc.)
+    private var displayName: String {
+        let words = title.split(separator: " ")
+        guard words.count > 2 else { return title }
+        return words.dropFirst(2).joined(separator: " ")
+    }
+
+    /// Picks a relevant SF Symbol based on keywords in the remaining name.
+    /// Falls back to a generic person icon when nothing matches or the name is empty.
+    private var iconName: String {
+        let name = displayName.lowercased()
+
+        guard !name.isEmpty else { return "person.crop.circle.fill" }
+
+        let marketKeywords = ["market", "grocery", "store", "mart", "supermarket"]
+        let cardKeywords = ["card", "bank", "visa", "mastercard", "credit", "debit"]
+        let foodKeywords = ["restaurant", "cafe", "coffee", "diner", "eatery"]
+        let transportKeywords = ["uber", "taxi", "lyft", "careem", "transport", "fuel", "gas"]
+        let billKeywords = ["electric", "utility", "bill", "internet", "phone", "wifi"]
+
+        if marketKeywords.contains(where: name.contains) { return "cart.fill" }
+        if cardKeywords.contains(where: name.contains) { return "creditcard.fill" }
+        if foodKeywords.contains(where: name.contains) { return "fork.knife" }
+        if transportKeywords.contains(where: name.contains) { return "car.fill" }
+        if billKeywords.contains(where: name.contains) { return "bolt.fill" }
+
+        // No category keyword matched — treat it as a person's name.
+        return "person.fill"
+    }
+
+    var body: some View {
+        HStack {
+            Image(systemName: iconName)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 21, height: 21)
@@ -27,18 +51,32 @@ struct TransactionCard : View {
                     Circle()
                         .stroke(Color.white.opacity(0.15), lineWidth: 1)
                 )
-            VStack(alignment: .leading){
-                CustomText(text: title, fontSize: 16).lineLimit(1)
-                Text(subtitle)
+
+            VStack(alignment: .leading) {
+                CustomText(text: displayName, fontSize: 16).lineLimit(1)
+                Text(date, format: .dateTime.weekday(.wide).month(.abbreviated).day().year())
             }
+
             Spacer()
-            Text("\(isAdd ? "+" : "-")$\(amount.formatted(.number.precision(.fractionLength(2))))").foregroundStyle(isAdd ? .green : .red).font(.title3)
-        }.padding().background(
-            Color(.white.opacity(0.2)).cornerRadius(10).frame(maxWidth:.infinity)
+
+            Text("\(isAdd ? "+" : "-")$\(abs(amount).formatted(.number.precision(.fractionLength(2))))")
+                .foregroundStyle(isAdd ? .green : .red)
+                .font(.title3)
+        }
+        .padding()
+        .background(
+            Color(.white.opacity(0.14)).cornerRadius(15).frame(maxWidth: .infinity)
         )
     }
 }
 
 #Preview {
-    RootView()
+    VStack(spacing: 12) {
+        TransactionCard(title: "Sent to Super Market", amount: 45.20, note: "", date: .now, isAdd: false)
+        TransactionCard(title: "Received from John Smith", amount: 120.00, note: "", date: .now, isAdd: true)
+        TransactionCard(title: "Paid to Visa Card", amount: 300.00, note: "", date: .now, isAdd: false)
+        TransactionCard(title: "Sent to xyz", amount: 10.00, note: "", date: .now, isAdd: false)
+    }
+    .padding()
+    .background(Color.black)
 }

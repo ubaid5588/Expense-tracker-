@@ -1,8 +1,75 @@
+//
+//  CreditCardView.swift
+//  A stylized, low-poly gradient credit card component.
+//
+//  Drop this file into your Xcode project. CreditCardView is a fully custom,
+//  reusable component — pass it a card number, holder name, CVV, and expiry
+//  date directly.
+//
+//  Usage:
+//      CreditCardView(
+//          number: "4532 8891 2245 7710",
+//          holderName: "JOHN SMITH",
+//          cvv: "384",
+//          validThru: "09/29",
+//          clubName: "CLUB NAME"   // optional, defaults to "CLUB NAME"
+//      )
+//
+
 import SwiftUI
 
- 
+// MARK: - Low-Poly Triangle Background
 
- 
+/// Draws a randomized field of translucent triangles over a gradient,  
+/// giving the "faceted / low-poly" look from the reference design.
+struct LowPolyBackground: View {
+    let seed: Int
+
+    var body: some View {
+        Canvas { context, size in
+            var generator = SeededGenerator(seed: seed)
+            let columns = 8
+            let rows = 5
+            let cellW = size.width / CGFloat(columns)
+            let cellH = size.height / CGFloat(rows)
+
+            for row in 0..<rows {
+                for col in 0..<columns {
+                    let x = CGFloat(col) * cellW
+                    let y = CGFloat(row) * cellH
+
+                    let jitter: (CGFloat) -> CGFloat = { base in
+                        base + CGFloat.random(in: -6...6, using: &generator)
+                    }
+
+                    let topLeft = CGPoint(x: jitter(x), y: jitter(y))
+                    let topRight = CGPoint(x: jitter(x + cellW), y: jitter(y))
+                    let bottomLeft = CGPoint(x: jitter(x), y: jitter(y + cellH))
+                    let bottomRight = CGPoint(x: jitter(x + cellW), y: jitter(y + cellH))
+
+                    // Two triangles per cell, alternating tint for the faceted look.
+                    let opacity1 = Double.random(in: 0.02...0.09, using: &generator)
+                    var path1 = Path()
+                    path1.move(to: topLeft)
+                    path1.addLine(to: topRight)
+                    path1.addLine(to: bottomLeft)
+                    path1.closeSubpath()
+                    context.fill(path1, with: .color(.white.opacity(opacity1)))
+
+                    let opacity2 = Double.random(in: 0.0...0.06, using: &generator)
+                    var path2 = Path()
+                    path2.move(to: topRight)
+                    path2.addLine(to: bottomRight)
+                    path2.addLine(to: bottomLeft)
+                    path2.closeSubpath()
+                    context.fill(path2, with: .color(.black.opacity(opacity2)))
+                }
+            }
+        }
+    }
+}
+
+/// Deterministic seeded random generator so a given card's facets stay stable across redraws.
 struct SeededGenerator: RandomNumberGenerator {
     private var state: UInt64
     init(seed: Int) { self.state = UInt64(bitPattern: Int64(seed)) &+ 0x9E3779B97F4A7C15 }
@@ -13,8 +80,9 @@ struct SeededGenerator: RandomNumberGenerator {
         return state
     }
 }
- 
- 
+
+// MARK: - Chip Icon
+
 struct ChipIcon: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 6, style: .continuous)
@@ -44,8 +112,9 @@ struct ChipIcon: View {
             )
     }
 }
- 
- 
+
+// MARK: - Network Logo (generic two-circle mark, not tied to any real brand)
+
 struct PaymentNetworkMark: View {
     var body: some View {
         HStack(spacing: -14) {
@@ -61,19 +130,23 @@ struct PaymentNetworkMark: View {
     }
 }
 
- 
+// MARK: - Credit Card View
+
 struct CreditCardView: View {
- 
-   
-    let number: String
+
+    // MARK: Required inputs
+    let number: String        // raw digits or pre-spaced, e.g. "1234567891018598" or "1234 5678 9101 8598"
     let holderName: String
     let cvv: String
-    let validThru: String
- 
+    let validThru: String     // "MM/YY"
+
     // MARK: Optional inputs
     var clubName: String = "CLUB NAME"
+    var isRevealed: Bool = true   // when false, number/CVV are masked
     var seed: Int = Int.random(in: 0...9999)
- 
+
+    /// Splits the raw number into groups of 4 for display, regardless of whether
+    /// spaces were already included when the caller passed the number in.
     private var numberGroups: [String] {
         let digitsOnly = number.filter { $0.isNumber }
         return stride(from: 0, to: digitsOnly.count, by: 4).map { start in
@@ -82,10 +155,23 @@ struct CreditCardView: View {
             return String(digitsOnly[startIndex..<endIndex])
         }
     }
- 
+
+    /// Masks every group except the last one when `isRevealed` is false,
+    /// e.g. "•••• •••• •••• 8598".
+    private var displayedNumberGroups: [String] {
+        guard !isRevealed else { return numberGroups }
+        return numberGroups.enumerated().map { index, group in
+            index == numberGroups.count - 1 ? group : String(repeating: "•", count: group.count)
+        }
+    }
+
+    private var displayedCVV: String {
+        isRevealed ? cvv : String(repeating: "•", count: max(cvv.count, 3))
+    }
+
     var body: some View {
         ZStack {
-
+            // Background gradient: deep purple -> magenta -> blue, matching the reference.
             LinearGradient(
                 colors: [
                     Color(red: 0.55, green: 0.10, blue: 0.35),
@@ -96,9 +182,10 @@ struct CreditCardView: View {
                 endPoint: .topTrailing
             )
 
- 
+            LowPolyBackground(seed: seed)
+
             VStack(alignment: .leading, spacing: 0) {
-               
+                // Top row: chip + club name
                 HStack(alignment: .top) {
                     ChipIcon()
                     Spacer()
@@ -107,26 +194,27 @@ struct CreditCardView: View {
                         .foregroundColor(.white)
                         .tracking(1)
                 }
- 
+
                 Spacer(minLength: 18)
- 
-               
+
+                // Card number
                 HStack(spacing: 14) {
-                    ForEach(Array(numberGroups.enumerated()), id: \.offset) { _, group in
+                    ForEach(Array(displayedNumberGroups.enumerated()), id: \.offset) { _, group in
                         Text(group)
                             .font(.system(size: 24, weight: .semibold, design: .monospaced))
                             .foregroundColor(.white)
                     }
                 }
                 .shadow(color: .black.opacity(0.25), radius: 1, x: 0, y: 1)
- 
-                Text(cvv)
+                .animation(.easeInOut(duration: 0.2), value: isRevealed)
+
+                Text(displayedCVV)
                     .font(.system(size: 10, weight: .medium, design: .monospaced))
                     .foregroundColor(.white.opacity(0.85))
                     .padding(.top, 2)
- 
+
                 Spacer(minLength: 14)
- 
+
                 // Valid thru
                 HStack(alignment: .bottom, spacing: 6) {
                     Text("VALID\nTHRU")
@@ -137,25 +225,25 @@ struct CreditCardView: View {
                         .font(.system(size: 16, weight: .semibold, design: .monospaced))
                         .foregroundColor(.white)
                 }
- 
+
                 Spacer(minLength: 14)
- 
-               
+
+                // Bottom row: name + network mark
                 HStack(alignment: .center) {
                     Text(holderName)
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(.white)
                         .tracking(1.5)
- 
+
                     Spacer()
- 
+
                     PaymentNetworkMark()
                         .padding(.bottom, 8)
                 }
             }
             .padding(20)
         }
-        .frame(width: 380, height: 220)
+        .frame(width: 360, height: 220)
         .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -165,6 +253,18 @@ struct CreditCardView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
-    CardView()
+    ZStack {
+        Color(white: 0.08).ignoresSafeArea()
+        CreditCardView(
+            number: "1234 5678 9101 8598",
+            holderName: "NAME SURNAME",
+            cvv: "255",
+            validThru: "12/17",
+            clubName: "CLUB NAME"
+        )
+    }
+    .preferredColorScheme(.dark)
 }
