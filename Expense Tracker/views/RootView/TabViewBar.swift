@@ -20,8 +20,8 @@ struct TabViewBar: View {
                     Label("Home", systemImage: "house")
                 }
                 .tag(0)
- 
-                TransactionView()
+
+            TransactionView(selectedTab: $selectedTab)
                 .tabItem {
                     Label("Transaction", systemImage: "arrow.left.arrow.right")
                 }
@@ -40,8 +40,11 @@ struct TabViewBar: View {
                 .tag(3)
         }
         .tint(.orange)
+        .environmentObject(AppState())   // <- injected once here
     }
 }
-#Preview{
+
+#Preview {
     RootView()
+        .environmentObject(AppState())
 }

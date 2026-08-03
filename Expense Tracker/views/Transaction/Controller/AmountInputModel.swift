@@ -27,6 +27,12 @@ class AmountInputModel: ObservableObject {
     func reset() {
         rawDigits = ""
     }
+
+    /// Pre-fills the model from an existing value — e.g. loading a saved budget for editing.
+    func setValue(_ value: Double) {
+        let cents = max(Int((value * 100).rounded()), 0)
+        rawDigits = cents == 0 ? "" : String(cents)
+    }
     
     func append(_ digit: String) {
         // Cap at a reasonable max (e.g. $9,999,999.99) to avoid runaway strings.

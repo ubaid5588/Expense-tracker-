@@ -19,6 +19,7 @@ struct ExpenseTrackerApp: App {
                         Account.self,
                         Transaction.self,
                         Card.self
+                       
                     ])
                 }
 

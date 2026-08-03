@@ -20,6 +20,7 @@ enum Theme {
 }
 
 struct TransactionView: View {
+    @Binding var selectedTab: Int
     @State private var isIncomeButton: Bool = false
     @StateObject private var amountModel = AmountInputModel()
     @State private var showCategoryPicker = false
@@ -27,6 +28,8 @@ struct TransactionView: View {
     @Query var accounts: [Account]
     @State private var selection = "Select Account"
     @State private var showSuccessAnimation = false
+    @State private var showNoAccountAlert = false
+    @EnvironmentObject var appState: AppState
 
     var body: some View {
         VStack {
@@ -72,46 +75,56 @@ struct TransactionView: View {
         }
         // Default the account picker to the first available account.
         .onAppear { useFirstAccountIfNeeded() }
-        .onChange(of: accounts.count) { _, _ in useFirstAccountIfNeeded() }
-        .overlay {
-            if showSuccessAnimation {
-                SuccessCheckmarkView()
-            }
-        }
+                .onChange(of: accounts.count) { _, _ in useFirstAccountIfNeeded() }
+                .overlay {
+                    if showSuccessAnimation {
+                        SuccessCheckmarkView()
+                    }
+                }
+                .alert("No Account Found", isPresented: $showNoAccountAlert) {
+                    Button("Add Account") {
+                        appState.pendingAddAccount = true
+                        selectedTab = 0   // index of your Home tab
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("You need to add an account before adding a transaction.")
+                }
     }
     
 
     private func useFirstAccountIfNeeded() {
-        guard selection == "Select Account", let first = accounts.first else { return }
-        selection = first.accountName
-    }
+           guard selection == "Select Account", let first = accounts.first else { return }
+           selection = first.accountName
+       }
 
-    private func addTransaction() {
-        guard amountModel.decimalValue > 0 else { return }
+       private func addTransaction() {
+           guard !accounts.isEmpty else {
+               showNoAccountAlert = true
+               return
+           }
+           guard amountModel.decimalValue > 0 else { return }
 
-        let addTransaction = Transaction(
-            title: !isIncomeButton ? "Sent to \(selection)" : "Received from \(selection)",
-            date: .now,
-            note: "Sent to received from person",
-            amount: !isIncomeButton ? -(amountModel.decimalValue) : +(amountModel.decimalValue),
-            isAdd: isIncomeButton ? true : false
-        )
-        modelContext.insert(addTransaction)
+           let addTransaction = Transaction(
+               title: !isIncomeButton ? "Sent to \(selection)" : "Received from \(selection)",
+               date: .now,
+               note: "Sent to received from person",
+               amount: !isIncomeButton ? -(amountModel.decimalValue) : +(amountModel.decimalValue),
+               isAdd: isIncomeButton ? true : false
+           )
+           modelContext.insert(addTransaction)
+           amountModel.reset()
 
-        // Clear the amount back to $0.00.
-        amountModel.reset()
-
-        // Show a brief success animation, then auto-dismiss.
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.65)) {
-            showSuccessAnimation = true
-        }
-        Task {
-            try? await Task.sleep(nanoseconds: 900_000_000) // 0.9s
-            withAnimation(.easeOut(duration: 0.25)) {
-                showSuccessAnimation = false
-            }
-        }
-    }
+           withAnimation(.spring(response: 0.35, dampingFraction: 0.65)) {
+               showSuccessAnimation = true
+           }
+           Task {
+               try? await Task.sleep(nanoseconds: 900_000_000)
+               withAnimation(.easeOut(duration: 0.25)) {
+                   showSuccessAnimation = false
+               }
+           }
+       }
 }
 
 /// A brief scale + fade checkmark shown after a transaction is saved.

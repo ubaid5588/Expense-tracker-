@@ -59,6 +59,3 @@ struct ListTitle: View {
         )
     }
 }
-#Preview {
-    SettingView()
-}

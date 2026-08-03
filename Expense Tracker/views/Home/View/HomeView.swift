@@ -16,9 +16,8 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Query var accounts: [Account]
     @Query var transactions: [Transaction]
-
-    /// Sum of all transactions. `amount` is already signed when the transaction
-    /// is created (negative for expenses, positive for income), so just add them up.
+    @EnvironmentObject var appState: AppState
+   
     private var totalBalance: Double {
         transactions.reduce(0) { total, transaction in
             total + transaction.amount
@@ -54,11 +53,12 @@ struct HomeView: View {
                 }).alert("Enter Account", isPresented: $showAlert) {
                     TextField("Name", text: $inputAccount)
                     Button("OK") {
-                        let account = Account(accountName: inputAccount)
+                        let trimmed = inputAccount.trimmingCharacters(in: .whitespacesAndNewlines)
+                        guard !trimmed.isEmpty else { return }
+                        let account = Account(accountName: trimmed)
                         modelContext.insert(account)
                         do {
                             try modelContext.save()
-                            print(accounts)
                         } catch {
                             print(error)
                         }
@@ -76,8 +76,9 @@ struct HomeView: View {
                             ForEach(accounts) { account in
                                 VStack(spacing: 6) {
                                     HStack(spacing: 2) {
-                                        Text(getFirstLetterOfEachWord(from: account.accountName)[0])
-                                        Text(getFirstLetterOfEachWord(from: account.accountName)[1])
+                                        ForEach(initials(for: account.accountName), id: \.self) { letter in
+                                            Text(letter)
+                                        }
                                     }
                                     .fontWeight(.medium)
                                     .padding(.horizontal, 2)
@@ -112,13 +113,22 @@ struct HomeView: View {
             }
             Spacer()
         }
-        .appBackground()
+        .appBackground().onChange(of: appState.pendingAddAccount) { _, newValue in
+            if newValue {
+                showAlert = true              // reuses your existing "Enter Account" alert
+                appState.pendingAddAccount = false
+            }
+        }
         .sheet(isPresented: $showAllAccountsSheet) {
             AllAccountsSheet(accounts: accounts)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
     }
+}
+func initials(for name: String) -> [String] {
+    let letters = getFirstLetterOfEachWord(from: name)
+    return Array(letters.prefix(2))
 }
 
 func getFirstLetterOfEachWord(from text: String) -> [String] {

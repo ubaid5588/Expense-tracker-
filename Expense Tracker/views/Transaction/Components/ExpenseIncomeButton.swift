@@ -27,7 +27,3 @@ struct ExpenseIncomeButton : View {
         }
     }
 }
-
-#Preview{
-    TransactionView()
-}

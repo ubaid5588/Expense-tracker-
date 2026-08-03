@@ -22,6 +22,3 @@ struct TransButton : View {
             .buttonStyle(.plain)
         }
 }
-#Preview {
-    SettingView()
-}

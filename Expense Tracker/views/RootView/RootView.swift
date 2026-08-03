@@ -13,7 +13,7 @@ struct RootView : View {
         VStack {
             TabViewBar()
             
-        }.navigationBarBackButtonHidden(true)
+        }.navigationBarBackButtonHidden(true).environmentObject(AppState())
     }
 }
 #Preview {

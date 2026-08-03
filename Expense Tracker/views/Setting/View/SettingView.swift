@@ -16,8 +16,8 @@ struct SettingView: View {
     var body: some View {
         VStack {
             CustomText(text: "Settings", fontSize: 20)
-            VStack{
-               
+            VStack {
+
                 VStack {
                     ListTitle(
                         image: "person.fill",
@@ -34,16 +34,35 @@ struct SettingView: View {
                         .presentationDetents([.fraction(0.5), .large])
                         .presentationDragIndicator(.visible)
                 }
+
+                NavigationLink {
+                    AccountBreakdownView()
+                } label: {
+                    HStack {
+                        Image(systemName: "chart.pie.fill")
+                            .foregroundStyle(.orange)
+                        Text("Monthly Overview")
+                            .foregroundStyle(.white)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.white.opacity(0.08))
+                    )
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 16)
+
                 Spacer()
-            }.appBackground()
+            }
+            .padding(.horizontal)
+            .appBackground()
         }
-        
     }
 }
-
-import SwiftUI
-import PhotosUI
-import SwiftData
 
 struct BottomSheetContent: View {
     @Environment(\.modelContext) private var modelContext
@@ -105,7 +124,7 @@ struct BottomSheetContent: View {
                         .textFieldStyle(.roundedBorder)
                     TextField("Enter Your User Name", text: $userName)
                         .textFieldStyle(.roundedBorder)
-                }.padding(.trailing,17)
+                }.padding(.trailing, 17)
             }
 
             Button(action: saveUserProfile) {
@@ -139,7 +158,6 @@ struct BottomSheetContent: View {
             do {
                 try rawImageData.write(to: destinationURL)
 
-    
                 if let oldPath = existing?.profilePath {
                     let oldURL = FileManager.documentsDirectory.appendingPathComponent(oldPath)
                     try? FileManager.default.removeItem(at: oldURL)
@@ -166,5 +184,8 @@ struct BottomSheetContent: View {
 }
 
 #Preview {
-    SettingView()
+    NavigationStack {
+        SettingView()
+    }
+    .modelContainer(for: [AppUser.self, Transaction.self], inMemory: true)
 }
