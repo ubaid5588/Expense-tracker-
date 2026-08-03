@@ -11,7 +11,13 @@ import SwiftData
 
 struct SettingView: View {
     @State private var showBottomSheet = false
+    @State private var showResetConfirmation = false
+    @Environment(\.modelContext) private var modelContext
+
     @Query private var users: [AppUser]
+    @Query private var accounts: [Account]
+    @Query private var transactions: [Transaction]
+    @Query private var cards: [Card]
 
     var body: some View {
         VStack {
@@ -55,12 +61,71 @@ struct SettingView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 16)
+        
+
+                Button {
+                    showResetConfirmation = true
+                } label: {
+                    HStack {
+                        Image(systemName: "trash.fill")
+                            .foregroundStyle(.red)
+                        Text("Reset App")
+                            .foregroundStyle(.red)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.red.opacity(0.12))
+                    )
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 12)
 
                 Spacer()
             }
             .padding(.horizontal)
             .appBackground()
         }
+        .confirmationDialog(
+            "Reset App?",
+            isPresented: $showResetConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Reset Everything", role: .destructive) {
+                resetApp()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will permanently delete all accounts, transactions, cards, and your profile. This cannot be undone.")
+        }
+    }
+
+    private func resetApp() {
+        // Remove any saved profile photos from disk before deleting the user records.
+        for user in users {
+            if let path = user.profilePath {
+                let url = FileManager.documentsDirectory.appendingPathComponent(path)
+                try? FileManager.default.removeItem(at: url)
+            }
+        }
+
+        for transaction in transactions {
+            modelContext.delete(transaction)
+        }
+        for account in accounts {
+            modelContext.delete(account)
+        }
+        for card in cards {
+            modelContext.delete(card)
+        }
+        for user in users {
+            modelContext.delete(user)
+        }
+
+        try? modelContext.save()
     }
 }
 
@@ -187,5 +252,5 @@ struct BottomSheetContent: View {
     NavigationStack {
         SettingView()
     }
-    .modelContainer(for: [AppUser.self, Transaction.self], inMemory: true)
+    .modelContainer(for: [AppUser.self, Account.self, Transaction.self, Card.self], inMemory: true)
 }
