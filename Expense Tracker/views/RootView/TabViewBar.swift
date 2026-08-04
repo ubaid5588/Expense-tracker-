@@ -40,7 +40,7 @@ struct TabViewBar: View {
                 .tag(3)
         }
         .tint(.orange)
-        .environmentObject(AppState())   // <- injected once here
+        .environmentObject(AppState()) 
     }
 }
 

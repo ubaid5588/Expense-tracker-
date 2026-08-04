@@ -1,21 +1,20 @@
 import SwiftUI
 
 struct TransactionCard: View {
-    var title: String       // e.g. "Sent to Super Market", "Received from John Smith"
+    var title: String
     var amount: Double
     var note: String
     var date: Date
     var isAdd: Bool
 
-    /// Everything after the first two words — the actual name (person, market, card, etc.)
+  
     private var displayName: String {
         let words = title.split(separator: " ")
         guard words.count > 2 else { return title }
         return words.dropFirst(2).joined(separator: " ")
     }
 
-    /// Picks a relevant SF Symbol based on keywords in the remaining name.
-    /// Falls back to a generic person icon when nothing matches or the name is empty.
+
     private var iconName: String {
         let name = displayName.lowercased()
 
@@ -33,7 +32,6 @@ struct TransactionCard: View {
         if transportKeywords.contains(where: name.contains) { return "car.fill" }
         if billKeywords.contains(where: name.contains) { return "bolt.fill" }
 
-        // No category keyword matched — treat it as a person's name.
         return "person.fill"
     }
 

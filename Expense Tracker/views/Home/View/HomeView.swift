@@ -213,7 +213,6 @@ struct BalanceCardView: View {
     }
 }
 
-// MARK: - All Accounts Bottom Sheet
 
 struct AllAccountsSheet: View {
     @Environment(\.dismiss) private var dismiss

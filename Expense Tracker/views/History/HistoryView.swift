@@ -12,7 +12,7 @@ struct HistoryView: View {
     @Query var transactions: [Transaction]
     @State private var selectedRange = "Today"
 
-    /// Transactions filtered down to the date range chosen in the picker.
+   
     private var filteredTransactions: [Transaction] {
         let calendar = Calendar.current
         let now = Date()

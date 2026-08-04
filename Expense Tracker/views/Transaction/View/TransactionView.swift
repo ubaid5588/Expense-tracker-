@@ -73,7 +73,7 @@ struct TransactionView: View {
             }
             .appBackground()
         }
-        // Default the account picker to the first available account.
+     
         .onAppear { useFirstAccountIfNeeded() }
                 .onChange(of: accounts.count) { _, _ in useFirstAccountIfNeeded() }
                 .overlay {
@@ -127,7 +127,6 @@ struct TransactionView: View {
        }
 }
 
-/// A brief scale + fade checkmark shown after a transaction is saved.
 struct SuccessCheckmarkView: View {
     @State private var animateIn = false
 

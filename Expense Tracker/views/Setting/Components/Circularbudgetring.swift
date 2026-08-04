@@ -11,7 +11,6 @@ struct CircularBudgetRing: View {
         return spent / limit
     }
  
-    /// Ring fill is capped at 100% visually, even if you've gone over.
     private var ringFraction: Double {
         min(max(percentage, 0), 1)
     }

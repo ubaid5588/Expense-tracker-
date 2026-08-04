@@ -104,7 +104,7 @@ struct SettingView: View {
     }
 
     private func resetApp() {
-        // Remove any saved profile photos from disk before deleting the user records.
+       
         for user in users {
             if let path = user.profilePath {
                 let url = FileManager.documentsDirectory.appendingPathComponent(path)

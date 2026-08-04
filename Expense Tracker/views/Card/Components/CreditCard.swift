@@ -18,10 +18,6 @@
 
 import SwiftUI
 
-// MARK: - Low-Poly Triangle Background
-
-/// Draws a randomized field of translucent triangles over a gradient,  
-/// giving the "faceted / low-poly" look from the reference design.
 struct LowPolyBackground: View {
     let seed: Int
 
@@ -69,7 +65,6 @@ struct LowPolyBackground: View {
     }
 }
 
-/// Deterministic seeded random generator so a given card's facets stay stable across redraws.
 struct SeededGenerator: RandomNumberGenerator {
     private var state: UInt64
     init(seed: Int) { self.state = UInt64(bitPattern: Int64(seed)) &+ 0x9E3779B97F4A7C15 }
@@ -81,7 +76,6 @@ struct SeededGenerator: RandomNumberGenerator {
     }
 }
 
-// MARK: - Chip Icon
 
 struct ChipIcon: View {
     var body: some View {
@@ -113,7 +107,6 @@ struct ChipIcon: View {
     }
 }
 
-// MARK: - Network Logo (generic two-circle mark, not tied to any real brand)
 
 struct PaymentNetworkMark: View {
     var body: some View {
@@ -134,19 +127,18 @@ struct PaymentNetworkMark: View {
 
 struct CreditCardView: View {
 
-    // MARK: Required inputs
-    let number: String        // raw digits or pre-spaced, e.g. "1234567891018598" or "1234 5678 9101 8598"
+   
+    let number: String
     let holderName: String
     let cvv: String
-    let validThru: String     // "MM/YY"
+    let validThru: String
 
     // MARK: Optional inputs
     var clubName: String = "CLUB NAME"
-    var isRevealed: Bool = true   // when false, number/CVV are masked
+    var isRevealed: Bool = true
     var seed: Int = Int.random(in: 0...9999)
 
-    /// Splits the raw number into groups of 4 for display, regardless of whether
-    /// spaces were already included when the caller passed the number in.
+   
     private var numberGroups: [String] {
         let digitsOnly = number.filter { $0.isNumber }
         return stride(from: 0, to: digitsOnly.count, by: 4).map { start in
@@ -156,8 +148,7 @@ struct CreditCardView: View {
         }
     }
 
-    /// Masks every group except the last one when `isRevealed` is false,
-    /// e.g. "•••• •••• •••• 8598".
+   
     private var displayedNumberGroups: [String] {
         guard !isRevealed else { return numberGroups }
         return numberGroups.enumerated().map { index, group in
@@ -171,7 +162,7 @@ struct CreditCardView: View {
 
     var body: some View {
         ZStack {
-            // Background gradient: deep purple -> magenta -> blue, matching the reference.
+           
             LinearGradient(
                 colors: [
                     Color(red: 0.55, green: 0.10, blue: 0.35),
@@ -185,7 +176,7 @@ struct CreditCardView: View {
             LowPolyBackground(seed: seed)
 
             VStack(alignment: .leading, spacing: 0) {
-                // Top row: chip + club name
+               
                 HStack(alignment: .top) {
                     ChipIcon()
                     Spacer()
@@ -197,7 +188,6 @@ struct CreditCardView: View {
 
                 Spacer(minLength: 18)
 
-                // Card number
                 HStack(spacing: 14) {
                     ForEach(Array(displayedNumberGroups.enumerated()), id: \.offset) { _, group in
                         Text(group)
@@ -215,7 +205,7 @@ struct CreditCardView: View {
 
                 Spacer(minLength: 14)
 
-                // Valid thru
+               
                 HStack(alignment: .bottom, spacing: 6) {
                     Text("VALID\nTHRU")
                         .font(.system(size: 8, weight: .semibold))
@@ -228,7 +218,7 @@ struct CreditCardView: View {
 
                 Spacer(minLength: 14)
 
-                // Bottom row: name + network mark
+            
                 HStack(alignment: .center) {
                     Text(holderName)
                         .font(.system(size: 17, weight: .semibold))
@@ -253,7 +243,7 @@ struct CreditCardView: View {
     }
 }
 
-// MARK: - Preview
+
 
 #Preview {
     ZStack {

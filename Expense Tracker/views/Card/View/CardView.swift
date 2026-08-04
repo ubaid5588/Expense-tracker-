@@ -12,7 +12,7 @@ struct CardView: View {
     @Query(sort: \Card.dateAdded, order: .reverse) private var cards: [Card]
 
     @State private var showAddSheet = false
-    @State private var isRevealed = false     // sensitive info hidden by default
+    @State private var isRevealed = false     
     @State private var cardPendingDeletion: Card?
 
     var body: some View {

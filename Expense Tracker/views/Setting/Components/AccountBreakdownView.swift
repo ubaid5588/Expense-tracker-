@@ -15,8 +15,6 @@ struct AccountBreakdownView: View {
 
     private let palette: [Color] = [.green, .red, .blue, .orange, .purple, .yellow, .pink, .cyan, .mint, .indigo]
 
-    /// This calendar month's transactions matching the selected mode
-    /// (isAdd == true for income, isAdd == false for expense).
     private var filteredTransactions: [Transaction] {
         let calendar = Calendar.current
         let now = Date()
@@ -25,8 +23,6 @@ struct AccountBreakdownView: View {
         }
     }
 
-    /// Groups the filtered transactions by the account name embedded in the title
-    /// (e.g. "Sent to Super Market" -> "Super Market"), same parsing TransactionCard uses.
     private var accountTotals: [(name: String, amount: Double)] {
         var totals: [String: Double] = [:]
         for transaction in filteredTransactions {

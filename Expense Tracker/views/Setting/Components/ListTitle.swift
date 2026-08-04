@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ListTitle: View {
     let image: String
-    var profileImage: UIImage? = nil   // new: real photo, optional
+    var profileImage: UIImage? = nil  
     let title: String
     let subtitle: String
     let amount: Double
