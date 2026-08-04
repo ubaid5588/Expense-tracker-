@@ -13,7 +13,7 @@ struct OnboardingView : View {
     let onboarding : [OnboardingModel] = [
         OnboardingModel(image: .onboarding1, title: "Keep Your Credit Card Information Organized", subtitle: "Securely save your credit card details for quick reference whenever you need them. Your information stays private on your device."),
         OnboardingModel(image: .onboarding2, title: "Take Control of Your Daily Spending", subtitle: "Record your income and expenses in seconds, and always know where your money goes."),
-        OnboardingModel(image: .onboarding3, title: "Build Better Financial Habits Every Month", subtitle: "Set budgets, monitor your spending, and stay on track to reach your financial goals.")
+        OnboardingModel(image: .onboarding3, title: "Build Better Financial Habits Every Month", subtitle: "Monitor your spending, and stay on track to reach your financial goals.")
     ]
     var body : some View {
         NavigationStack{
